@@ -54,7 +54,27 @@ int greeting() {
 
 int main() {
 
-    greeting();
+    FILE* customers_txt;
+    FILE* books_txt;
+    FILE* rented_txt;
+    FILE* history_txt;
+
+    if (customers_txt==NULL) {
+        customers_txt = fopen("customers.txt","W");
+        fclose(customers_txt);
+    }
+    if (books_txt==NULL) {
+        books_txt = fopen("books.txt","W");
+        fclose(books_txt);
+    }
+    if (rented_txt==NULL) {
+        rented_txt = fopen("rented.txt","W");
+        fclose(rented_txt);
+    }
+    if (history_txt==NULL) {
+        history_txt = fopen("history.txt","W");
+        fclose(history_txt);
+    }
 
     return 0;
 }
