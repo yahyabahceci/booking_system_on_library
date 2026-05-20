@@ -52,28 +52,82 @@ int greeting() {
     }
 }
 
-int main() {
+int create_new_customers() {
 
+    struct Customer people;
+    printf("Please enter new customer.");
+    printf("Name: ");
+    scanf("%c",people.name);
+
+    return 0;
+}
+
+int main() {
     FILE* customers_txt;
     FILE* books_txt;
     FILE* rented_txt;
     FILE* history_txt;
 
+    customers_txt = fopen("customers.txt", "r");
+    books_txt = fopen("books.txt", "r");
+    rented_txt = fopen("rented.txt", "r");
+    history_txt = fopen("history.txt", "r");
+
     if (customers_txt==NULL) {
-        customers_txt = fopen("customers.txt","W");
+        customers_txt = fopen("customers.txt","w");
         fclose(customers_txt);
     }
     if (books_txt==NULL) {
-        books_txt = fopen("books.txt","W");
+        books_txt = fopen("books.txt","w");
         fclose(books_txt);
     }
     if (rented_txt==NULL) {
-        rented_txt = fopen("rented.txt","W");
+        rented_txt = fopen("rented.txt","w");
         fclose(rented_txt);
     }
     if (history_txt==NULL) {
-        history_txt = fopen("history.txt","W");
+        history_txt = fopen("history.txt","w");
         fclose(history_txt);
+    }
+
+
+    int x = greeting();
+
+    if (x==1) {
+
+    }
+    else if (x==2) {
+
+    }
+    else if (x==3) {
+
+    }
+    else if (x==4) {
+
+    }
+    else if (x==5) {
+
+    }
+    else if (x==6) {
+
+    }
+    else if (x==7) {
+
+    }
+    else if (x==8) {
+
+    }
+    else if (x==9) {
+
+    }
+    else if (x==10) {
+
+    }
+    else if (x==11) {
+
+    }
+    else if (x==12) {
+
     }
 
     return 0;
