@@ -33,6 +33,14 @@ struct Rented {
 
 };
 
+struct Temp {
+    int id;
+    int age;
+    int wallet;
+    char name[50];
+    char surname[50];
+};
+
 int greeting() {
     int menu_choosing;
     printf("Please choose one operation.\n");
@@ -61,16 +69,17 @@ int greeting() {
 
 int create_new_customers() {
     struct Customer people;
+    struct Temp temp;
     int last_id=0;
-    int temp_id, temp_age, temp_wallet, c;
-    char temp_name[50], temp_surname[50], age_buffer[10];
+    int c;
+    char age_buffer[10];
 
     while ((c = getchar()) != '\n' && c != EOF)
     customers_txt = fopen("customers.txt","r");
 
     if (customers_txt != NULL) {
-        while (fscanf(customers_txt, "%d,%[^,],%[^,],%d,%d\n", &temp_id, temp_name, temp_surname, &temp_age, &temp_wallet) == 5) {
-            last_id = temp_id;
+        while (fscanf(customers_txt, "%d,%[^,],%[^,],%d,%d\n", &temp.id, temp.name, temp.surname, &temp.age, &temp.wallet) == 5) {
+            last_id = temp.id;
         }
         fclose(customers_txt);
     }
@@ -92,6 +101,40 @@ int create_new_customers() {
     fprintf(customers_txt,"%d,%s,%s,%d,%d\n",people.C_ID,people.name,people.surname,people.age,people.wallet);
     fclose(customers_txt);
 
+    printf("A new customer has been registered.");
+
+    return 0;
+}
+
+int deposit_money() {
+    FILE* temp_customers;
+    struct Customer people;
+    struct Temp temp;
+    int money = 0;
+    printf("DEPOSIT MONEY\n");
+    printf("Please enter customer's id.");
+    scanf("%d",&people.C_ID);
+    printf("Enter the amount of money:");
+    scanf("%d",&money);
+    customers_txt = fopen("customers.txt","r");
+    temp_customers = fopen("temp_customers.txt","w");
+
+    if (customers_txt != NULL) {
+        while (fscanf(customers_txt, "%d,%[^,],%[^,],%d,%d\n", &temp.id, temp.name, temp.surname, &temp.age, &temp.wallet) == 5) {
+            if (people.C_ID == temp.id) {
+                fprintf(temp_customers,"%d,%s,%s,%d,%d\n",temp.id,temp.name,temp.surname,temp.age,money);
+            }
+            else {
+                fprintf(temp_customers,"%d,%s,%s,%d,%d\n",temp.id,temp.name,temp.surname,temp.age,temp.wallet);
+            }
+        }
+    }
+    fclose(customers_txt);
+    fclose(temp_customers);
+
+    remove("customers.txt");
+    rename("temp_customers.txt","customers.txt");
+    printf("Deposit successful.");
     return 0;
 }
 
@@ -126,7 +169,7 @@ int main() {
         create_new_customers();
     }
     else if (x==2) {
-
+        deposit_money();
     }
     else if (x==3) {
 
