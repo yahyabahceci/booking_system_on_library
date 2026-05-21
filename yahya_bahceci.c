@@ -1,9 +1,15 @@
 #include <stdio.h>
+#include <string.h>
+
+FILE* customers_txt;
+FILE* books_txt;
+FILE* rented_txt;
+FILE* history_txt;
 
 struct Customer {
     int C_ID;
-    char* name;
-    char* surname;
+    char name[50];
+    char surname[50];
     int age;
     int wallet;
 };
@@ -53,20 +59,41 @@ int greeting() {
 }
 
 int create_new_customers() {
-
     struct Customer people;
-    printf("Please enter new customer.");
-    printf("Name: ");
-    scanf("%c",people.name);
+    int last_id=0;
+    int temp_id, temp_age, temp_wallet;
+    char temp_name[50], temp_surname[50];
+
+    customers_txt = fopen("customers.txt","r");
+
+    if (customers_txt != NULL) {
+        while (fscanf(customers_txt, "%d %s %s %d %d", &temp_id, temp_name, temp_surname, &temp_age, &temp_wallet)!=EOF) {
+            last_id = temp_id;
+        }
+        fclose(customers_txt);
+    }
+    people.C_ID = last_id+1;
+    people.wallet = 0;
+
+    printf("Please enter new customer.\n");
+    printf("Name:\n");
+    fgets(people.name,sizeof(people.name),stdin);
+    people.name[strcspn(people.name, "\n")] = '\0';
+    printf("Surname:\n");
+    fgets(people.surname,sizeof(people.surname),stdin);
+    people.surname[strcspn(people.surname, "\n")] = '\0';
+    printf("Age:");
+    scanf("%d",&people.age);
+
+
+    customers_txt = fopen("customers.txt","a");
+    fprintf(customers_txt,"\n%d %s %s %d %d",people.C_ID,people.name,people.surname,people.age,people.wallet);
+    fclose(customers_txt);
 
     return 0;
 }
 
 int main() {
-    FILE* customers_txt;
-    FILE* books_txt;
-    FILE* rented_txt;
-    FILE* history_txt;
 
     customers_txt = fopen("customers.txt", "r");
     books_txt = fopen("books.txt", "r");
@@ -94,7 +121,7 @@ int main() {
     int x = greeting();
 
     if (x==1) {
-
+        create_new_customers();
     }
     else if (x==2) {
 
