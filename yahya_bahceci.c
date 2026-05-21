@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 FILE* customers_txt;
 FILE* books_txt;
@@ -61,13 +62,14 @@ int greeting() {
 int create_new_customers() {
     struct Customer people;
     int last_id=0;
-    int temp_id, temp_age, temp_wallet;
-    char temp_name[50], temp_surname[50];
+    int temp_id, temp_age, temp_wallet, c;
+    char temp_name[50], temp_surname[50], age_buffer[10];
 
+    while ((c = getchar()) != '\n' && c != EOF)
     customers_txt = fopen("customers.txt","r");
 
     if (customers_txt != NULL) {
-        while (fscanf(customers_txt, "%d %s %s %d %d", &temp_id, temp_name, temp_surname, &temp_age, &temp_wallet)!=EOF) {
+        while (fscanf(customers_txt, "%d,%[^,],%[^,],%d,%d\n", &temp_id, temp_name, temp_surname, &temp_age, &temp_wallet) == 5) {
             last_id = temp_id;
         }
         fclose(customers_txt);
@@ -76,18 +78,18 @@ int create_new_customers() {
     people.wallet = 0;
 
     printf("Please enter new customer.\n");
-    printf("Name:\n");
+    printf("Name: ");
     fgets(people.name,sizeof(people.name),stdin);
     people.name[strcspn(people.name, "\n")] = '\0';
-    printf("Surname:\n");
+    printf("Surname: ");
     fgets(people.surname,sizeof(people.surname),stdin);
     people.surname[strcspn(people.surname, "\n")] = '\0';
-    printf("Age:");
-    scanf("%d",&people.age);
-
+    printf("Age: ");
+    fgets(age_buffer,sizeof(age_buffer),stdin);
+    people.age = atoi(age_buffer);
 
     customers_txt = fopen("customers.txt","a");
-    fprintf(customers_txt,"\n%d %s %s %d %d",people.C_ID,people.name,people.surname,people.age,people.wallet);
+    fprintf(customers_txt,"%d,%s,%s,%d,%d\n",people.C_ID,people.name,people.surname,people.age,people.wallet);
     fclose(customers_txt);
 
     return 0;
