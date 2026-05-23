@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 FILE* customers_txt;
 FILE* books_txt;
@@ -17,11 +18,12 @@ struct Customer {
 
 struct Book {
     int B_ID;
-    char* name;
-    char* author;
+    char name[100];
+    char author[50];
     int age_limit;
     int price_per_week;
-    float rented;
+    bool rented;
+
 };
 
 struct Rented {
@@ -37,8 +39,13 @@ struct Temp {
     int id;
     int age;
     int wallet;
+    int age_limit;
+    int money;
     char name[50];
     char surname[50];
+    char author[50];
+    char book[100];
+    bool rented;
 };
 
 int greeting() {
@@ -61,11 +68,11 @@ int greeting() {
 
     if (menu_choosing<=0 || menu_choosing>=13) {
         printf("Please choose correct menu!!!");
-        return 0;
     }
     else {
         return menu_choosing;
     }
+    return 0;
 }
 
 int create_new_customers() {
@@ -119,7 +126,7 @@ int deposit_money() {
     struct Temp temp;
     int money = 0;
     printf("DEPOSIT MONEY\n");
-    printf("Please enter customer's id.");
+    printf("Please enter customer's id: ");
     scanf("%d",&people.C_ID);
     printf("Enter the amount of money:");
     scanf("%d",&money);
@@ -142,6 +149,55 @@ int deposit_money() {
     remove("customers.txt");
     rename("temp_customers.txt","customers.txt");
     printf("Deposit successful.");
+    return 0;
+}
+
+int add_new_book() {
+    struct Book book;
+    struct Temp temp;
+    int last_id = 0;
+    int c;
+    char age_buffer[5];
+    char money_buffer[10];
+    while ((c = getchar()) != '\n' && c != EOF)
+
+    printf("Please enter new book.\n");
+    printf("The name of the book: ");
+    fgets(book.name,sizeof(book.name),stdin);
+    book.name[strcspn(book.name,"\n")] = '\0';
+    printf("The name of the author: ");
+    fgets(book.author,sizeof(book.author),stdin);
+    book.author[strcspn(book.author,"\n")] = '\0';
+    printf("Enter the age limit of the book: ");
+    fgets(age_buffer,sizeof(age_buffer),stdin);
+    age_buffer[strcspn(age_buffer,"\n")] = '\0';
+    book.age_limit = atoi(age_buffer);
+    printf("Please enter price per week: ");
+    fgets(money_buffer,sizeof(money_buffer),stdin);
+    age_buffer[strcspn(money_buffer,"\n")] = '\0';
+    book.price_per_week = atoi(money_buffer);
+
+    books_txt = fopen("books.txt","r");
+
+    if (books_txt != NULL) {
+        while (fscanf(books_txt,"%d,%[^,],%[^,],%d,%d,%d\n", &temp.id, temp.book, temp.author, &temp.age_limit, &temp.money, &temp.rented) == 5) {
+            last_id = temp.id;
+            if (strcmp(temp.book,book.name) == 0 && strcmp(temp.author,temp.author) == 0) {
+                printf("This book exists and its B_ID (Book ID) is %d.",temp.id);
+                return 1;
+            }
+        }
+        fclose(books_txt);
+    }
+    book.B_ID = last_id + 1;
+    book.rented = false;
+
+    books_txt = fopen("books.txt","a");
+    fprintf(books_txt,"%d,%s,%s,%d,%d,%d\n",book.B_ID,book.name,book.author,book.age_limit,book.price_per_week,book.rented);
+    fclose(books_txt);
+
+    printf("A new book has been added to system. B_ID (Book ID) is %d",book.B_ID);
+
     return 0;
 }
 
@@ -179,34 +235,7 @@ int main() {
         deposit_money();
     }
     else if (x==3) {
-
-    }
-    else if (x==4) {
-
-    }
-    else if (x==5) {
-
-    }
-    else if (x==6) {
-
-    }
-    else if (x==7) {
-
-    }
-    else if (x==8) {
-
-    }
-    else if (x==9) {
-
-    }
-    else if (x==10) {
-
-    }
-    else if (x==11) {
-
-    }
-    else if (x==12) {
-
+        add_new_book();
     }
 
     return 0;
