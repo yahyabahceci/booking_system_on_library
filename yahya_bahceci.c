@@ -61,6 +61,7 @@ int greeting() {
 
     if (menu_choosing<=0 || menu_choosing>=13) {
         printf("Please choose correct menu!!!");
+        return 0;
     }
     else {
         return menu_choosing;
@@ -72,19 +73,9 @@ int create_new_customers() {
     struct Temp temp;
     int last_id=0;
     int c;
-    char age_buffer[10];
+    char age_buffer[5];
 
     while ((c = getchar()) != '\n' && c != EOF)
-    customers_txt = fopen("customers.txt","r");
-
-    if (customers_txt != NULL) {
-        while (fscanf(customers_txt, "%d,%[^,],%[^,],%d,%d\n", &temp.id, temp.name, temp.surname, &temp.age, &temp.wallet) == 5) {
-            last_id = temp.id;
-        }
-        fclose(customers_txt);
-    }
-    people.C_ID = last_id+1;
-    people.wallet = 0;
 
     printf("Please enter new customer.\n");
     printf("Name: ");
@@ -97,11 +88,27 @@ int create_new_customers() {
     fgets(age_buffer,sizeof(age_buffer),stdin);
     people.age = atoi(age_buffer);
 
+
+    customers_txt = fopen("customers.txt","r");
+
+    if (customers_txt != NULL) {
+        while (fscanf(customers_txt, "%d,%[^,],%[^,],%d,%d\n", &temp.id, temp.name, temp.surname, &temp.age, &temp.wallet) == 5) {
+            last_id = temp.id;
+            if (strcmp(temp.name,people.name) == 0 && strcmp(temp.surname,people.surname) == 0){
+                printf("This customer exists and He/She has %d C_ID(Customer ID).",temp.id);
+                return 1;
+            }
+        }
+        fclose(customers_txt);
+    }
+    people.C_ID = last_id+1;
+    people.wallet = 0;
+
     customers_txt = fopen("customers.txt","a");
     fprintf(customers_txt,"%d,%s,%s,%d,%d\n",people.C_ID,people.name,people.surname,people.age,people.wallet);
     fclose(customers_txt);
 
-    printf("A new customer has been registered.");
+    printf("A new customer has been registered. C_ID(Customer ID)is %d.",people.C_ID);
 
     return 0;
 }
