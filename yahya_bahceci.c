@@ -41,11 +41,11 @@ struct Temp {
     int wallet;
     int age_limit;
     int money;
+    int rented;
     char name[50];
     char surname[50];
     char author[50];
-    char book[100];
-    bool rented;
+    char book[100];;
 };
 
 int greeting() {
@@ -180,7 +180,7 @@ int add_new_book() {
     books_txt = fopen("books.txt","r");
 
     if (books_txt != NULL) {
-        while (fscanf(books_txt,"%d,%[^,],%[^,],%d,%d,%d\n", &temp.id, temp.book, temp.author, &temp.age_limit, &temp.money, &temp.rented) == 5) {
+        while (fscanf(books_txt,"%d,%[^,],%[^,],%d,%d,%d\n", &temp.id, temp.book, temp.author, &temp.age_limit, &temp.money, &temp.rented) == 6) {
             last_id = temp.id;
             if (strcmp(temp.book,book.name) == 0 && strcmp(temp.author,temp.author) == 0) {
                 printf("This book exists and its B_ID (Book ID) is %d.",temp.id);
