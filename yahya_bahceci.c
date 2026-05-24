@@ -65,10 +65,11 @@ int greeting() {
     printf("9. List of Customers\n");
     printf("10. List of Books\n");
     printf("11. Search Book\n");
+    printf("12. Exit\n");
     printf("--->");
     scanf("%d",&menu_choosing);
 
-    if (menu_choosing<=0 || menu_choosing>=12) {
+    if (menu_choosing<=0 || menu_choosing>=13) {
         printf("Please choose correct menu!!!");
     }
     else {
@@ -645,42 +646,46 @@ int main() {
     }
 
 
-    int x = greeting();
+    while (1) {
+        int x = greeting();
 
-    if (x==1) {
-        create_new_customers();
+        if (x==1) {
+            create_new_customers();
+        }
+        else if (x==2) {
+            deposit_money();
+        }
+        else if (x==3) {
+            add_new_book();
+        }
+        else if (x==4) {
+            rent_book();
+        }
+        else if (x==5) {
+            delivery_book();
+        }
+        else if (x==6) {
+            burn_book();
+        }
+        else if (x==7) {
+            update_information();
+        }
+        else if (x==8) {
+            list_rented_customers();
+        }
+        else if (x==9) {
+            list_customers();
+        }
+        else if (x==10) {
+            list_books();
+        }
+        else if (x==11) {
+            search_book();
+        }
+        else if (x==12) {
+            break;
+        }
     }
-    else if (x==2) {
-        deposit_money();
-    }
-    else if (x==3) {
-        add_new_book();
-    }
-    else if (x==4) {
-        rent_book();
-    }
-    else if (x==5) {
-        delivery_book();
-    }
-    else if (x==6) {
-        burn_book();
-    }
-    else if (x==7) {
-        update_information();
-    }
-    else if (x==8) {
-        list_rented_customers();
-    }
-    else if (x==9) {
-        list_customers();
-    }
-    else if (x==10) {
-        list_books();
-    }
-    else if (x==11) {
-        search_book();
-    }
-
-
     return 0;
+
 }
