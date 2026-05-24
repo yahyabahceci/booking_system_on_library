@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <stdbool.h>
 
 FILE* customers_txt;
 FILE* books_txt;
@@ -22,7 +21,7 @@ struct Book {
     char author[50];
     int age_limit;
     int price_per_week;
-    bool rented;
+    int rented;
 
 };
 
@@ -30,7 +29,7 @@ struct Rented {
     int R_ID;
     int C_ID;
     int B_ID;
-    char* rented_date;
+    char rented_date[50];
     int week;
 
 };
@@ -201,6 +200,74 @@ int add_new_book() {
     return 0;
 }
 
+int rent_book() {
+    FILE* temp_books;
+    struct Book book;
+    struct Temp temp;
+    struct Rented rented;
+    struct Customer people;
+
+    printf("Please enter your C_ID(Customer ID): \n");
+    scanf("%d",&rented.C_ID);
+    printf("Please choose your book and enter B_ID(Book ID): \n");
+    scanf("%d",&rented.B_ID);
+    printf("How many weeks will you rent?: \n");
+    scanf("%d",&rented.week);
+
+    books_txt = fopen("books.txt","r");
+
+    if (books_txt != NULL) {
+        while (fscanf(books_txt,"%d,%[^,],%[^,],%d,%d,%d\n", &temp.id, temp.book, temp.author, &temp.age_limit, &temp.money, &temp.rented) == 6) {
+            if (temp.id == rented.B_ID) {
+                int book_money = temp.money;
+                int book_age = temp.age_limit;
+                if (temp.rented==0) {
+                    customers_txt = fopen("customer.txt","r");
+                    while (fscanf(customers_txt, "%d,%[^,],%[^,],%d,%d\n", &people.C_ID, people.name, people.surname, &people.age, &people.wallet) == 5) {
+                        if (people.C_ID == rented.C_ID) {
+                            if (book_money * rented.week <= people.wallet) {
+                                if (book_age <= people.age) {
+                                    fclose(books_txt);
+                                    books_txt = fopen("books.txt","r");
+                                    temp_books = fopen("temp_books.txt","w");
+                                    while(fscanf(books_txt,"%d,%[^,],%[^,],%d,%d,%d\n", &book.B_ID, book.name, book.author, &book.age_limit, &book.price_per_week, &book.rented) == 6) {
+                                        if (rented.B_ID == book.B_ID) {
+                                            fprintf(temp_books,"%d,%s,%s,%d,%d,1\n",book.B_ID,book.name,book.author,book.age_limit,book.price_per_week);
+                                        }
+                                        else {
+                                            fprintf(temp_books,"%d,%s,%s,%d,%d,%d\n",book.B_ID,book.name,book.author,book.age_limit,book.price_per_week,book.rented);
+                                        }
+                                    }
+                                    fclose(books_txt);
+                                    fclose(temp_books);
+                                    remove("books.txt");
+                                    rename("temp_books.txt","books.txt");
+                                    history_txt = fopen("history.txt","w");
+
+                                }
+                                else {
+                                    printf("You can not rent because of age limit.");
+                                }
+                            }
+                            else {
+                                printf("You do not have enough money to rent this book.");
+                                return 2;
+                            }
+                        }
+                    }
+                }
+                else {
+                    printf("%s was rented.",temp.book);
+                    return 3;
+                }
+            }
+        }
+        fclose(books_txt);
+    }
+
+    return 0;
+}
+
 int main() {
 
     customers_txt = fopen("customers.txt", "r");
@@ -236,6 +303,9 @@ int main() {
     }
     else if (x==3) {
         add_new_book();
+    }
+    else if (x==4) {
+        rent_book();
     }
 
     return 0;
