@@ -36,11 +36,15 @@ struct Rented {
 
 struct Temp {
     int id;
+    int cid;
+    int bid;
     int age;
     int wallet;
     int age_limit;
     int money;
     int rented;
+    int week;
+    char date[50];
     char name[50];
     char surname[50];
     char author[50];
@@ -135,7 +139,7 @@ int deposit_money() {
     if (customers_txt != NULL) {
         while (fscanf(customers_txt, "%d,%[^,],%[^,],%d,%d\n", &temp.id, temp.name, temp.surname, &temp.age, &temp.wallet) == 5) {
             if (people.C_ID == temp.id) {
-                fprintf(temp_customers,"%d,%s,%s,%d,%d\n",temp.id,temp.name,temp.surname,temp.age,money);
+                fprintf(temp_customers,"%d,%s,%s,%d,%d\n",temp.id,temp.name,temp.surname,temp.age,temp.wallet+money);
             }
             else {
                 fprintf(temp_customers,"%d,%s,%s,%d,%d\n",temp.id,temp.name,temp.surname,temp.age,temp.wallet);
@@ -181,7 +185,7 @@ int add_new_book() {
     if (books_txt != NULL) {
         while (fscanf(books_txt,"%d,%[^,],%[^,],%d,%d,%d\n", &temp.id, temp.book, temp.author, &temp.age_limit, &temp.money, &temp.rented) == 6) {
             last_id = temp.id;
-            if (strcmp(temp.book,book.name) == 0 && strcmp(temp.author,temp.author) == 0) {
+            if (strcmp(temp.book,book.name) == 0 && strcmp(temp.author,book.author) == 0) {
                 printf("This book exists and its B_ID (Book ID) is %d.",temp.id);
                 return 1;
             }
@@ -189,7 +193,7 @@ int add_new_book() {
         fclose(books_txt);
     }
     book.B_ID = last_id + 1;
-    book.rented = false;
+    book.rented = 0;
 
     books_txt = fopen("books.txt","a");
     fprintf(books_txt,"%d,%s,%s,%d,%d,%d\n",book.B_ID,book.name,book.author,book.age_limit,book.price_per_week,book.rented);
@@ -202,17 +206,32 @@ int add_new_book() {
 
 int rent_book() {
     FILE* temp_books;
+    FILE* books_read_txt;
     struct Book book;
     struct Temp temp;
     struct Rented rented;
     struct Customer people;
+    int c;
+    int last_id = 0;
 
-    printf("Please enter your C_ID(Customer ID): \n");
+    while ((c = getchar()) != '\n' && c != EOF);
+
+    printf("Please enter your C_ID(Customer ID): ");
     scanf("%d",&rented.C_ID);
-    printf("Please choose your book and enter B_ID(Book ID): \n");
+    printf("Please choose your book and enter B_ID(Book ID): ");
     scanf("%d",&rented.B_ID);
-    printf("How many weeks will you rent?: \n");
+    printf("How many weeks will you rent?: ");
     scanf("%d",&rented.week);
+
+    rented_txt = fopen("rented.txt","r");
+
+    if (rented_txt != NULL) {
+        while (fscanf(rented_txt, "%d,%d,%d,%[^,],%d\n", &temp.id, &temp.cid, &temp.bid, temp.date, &temp.week) == 5) {
+            last_id = temp.id;
+        }
+        fclose(rented_txt);
+    }
+    rented.R_ID = last_id + 1;
 
     books_txt = fopen("books.txt","r");
 
@@ -222,28 +241,38 @@ int rent_book() {
                 int book_money = temp.money;
                 int book_age = temp.age_limit;
                 if (temp.rented==0) {
-                    customers_txt = fopen("customer.txt","r");
+                    customers_txt = fopen("customers.txt","r");
                     while (fscanf(customers_txt, "%d,%[^,],%[^,],%d,%d\n", &people.C_ID, people.name, people.surname, &people.age, &people.wallet) == 5) {
                         if (people.C_ID == rented.C_ID) {
                             if (book_money * rented.week <= people.wallet) {
                                 if (book_age <= people.age) {
-                                    fclose(books_txt);
-                                    books_txt = fopen("books.txt","r");
-                                    temp_books = fopen("temp_books.txt","w");
-                                    while(fscanf(books_txt,"%d,%[^,],%[^,],%d,%d,%d\n", &book.B_ID, book.name, book.author, &book.age_limit, &book.price_per_week, &book.rented) == 6) {
-                                        if (rented.B_ID == book.B_ID) {
-                                            fprintf(temp_books,"%d,%s,%s,%d,%d,1\n",book.B_ID,book.name,book.author,book.age_limit,book.price_per_week);
-                                        }
-                                        else {
-                                            fprintf(temp_books,"%d,%s,%s,%d,%d,%d\n",book.B_ID,book.name,book.author,book.age_limit,book.price_per_week,book.rented);
-                                        }
-                                    }
-                                    fclose(books_txt);
-                                    fclose(temp_books);
-                                    remove("books.txt");
-                                    rename("temp_books.txt","books.txt");
-                                    history_txt = fopen("history.txt","w");
+                                    books_read_txt = fopen("books.txt", "r");
+                                    temp_books = fopen("temp_books.txt", "w");
 
+                                    if (books_read_txt != NULL && temp_books != NULL) {
+                                        while(fscanf(books_read_txt, "%d,%[^,],%[^,],%d,%d,%d\n", &book.B_ID, book.name, book.author, &book.age_limit, &book.price_per_week, &book.rented) == 6) {
+                                            if (rented.B_ID == book.B_ID) {
+                                                fprintf(temp_books, "%d,%s,%s,%d,%d,1\n", book.B_ID, book.name, book.author, book.age_limit, book.price_per_week);
+                                            }
+                                            else {
+                                                fprintf(temp_books, "%d,%s,%s,%d,%d,%d\n", book.B_ID, book.name, book.author, book.age_limit, book.price_per_week, book.rented);
+                                            }
+                                        }
+                                        fclose(books_read_txt);
+                                        fclose(temp_books);
+                                    }
+
+                                    printf("Please enter today's date: ");
+                                    while ((c = getchar()) != '\n' && c != EOF);
+
+                                    fgets(rented.rented_date, sizeof(rented.rented_date), stdin);
+                                    rented.rented_date[strcspn(rented.rented_date, "\n")] = '\0';
+
+                                    rented_txt = fopen("rented.txt", "a");
+                                    if (rented_txt != NULL) {
+                                        fprintf(rented_txt, "%d,%d,%d,%s,%d\n", rented.R_ID, rented.C_ID, rented.B_ID, rented.rented_date, rented.week);
+                                        fclose(rented_txt);
+                                    }
                                 }
                                 else {
                                     printf("You can not rent because of age limit.");
@@ -263,6 +292,8 @@ int rent_book() {
             }
         }
         fclose(books_txt);
+        remove("books.txt");
+        rename("temp_books.txt", "books.txt");
     }
 
     return 0;
